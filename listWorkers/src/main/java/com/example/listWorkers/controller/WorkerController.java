@@ -1,8 +1,10 @@
 package com.example.listWorkers.controller;
 
+import com.example.listWorkers.service.FileGateway;
 import lombok.AllArgsConstructor;
 import com.example.listWorkers.model.Worker;
 import com.example.listWorkers.service.WorkerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +24,23 @@ public class WorkerController {
     private final WorkerService service;
 
     /**
-     * Обработка информации о новом работнике для внесения её в базу данных.
+     * Реализация интерфейса FileGateway для вызова метода writeToFile()
+     */
+    private FileGateway fileGateway;
+
+
+    /**
+     * Обработка информации о новом работнике для внесения её в базу данных. Также внутри вызываются 2 метода:
+     * service.send() и fileGateway.writeToFile() для отправки сообщения наблюдателям о добавлении нового работника
+     * и записи данных о новом работнике в отдельный файл соответственно.
      * @param worker Принимает информацию о новом работнике в теле запроса.
      * @return Возвращает список всех работников для наглядной демонстрации, что новый работник был добавлен.
      */
     @PostMapping("/add")
     public List<Worker> addWorker(@RequestBody Worker worker) {
         service.addWorker(worker);
+        service.send(worker);
+        fileGateway.writeToFile(worker.getName() + ".txt", worker.toString());
         return service.getAllWorkers();
     }
 

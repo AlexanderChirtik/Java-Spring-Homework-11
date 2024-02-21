@@ -31,4 +31,10 @@ public class Worker {
      */
     @Column(nullable = false)
     private String post;
+
+    /**
+     * Тип оповещения наблюдателей о добавлении данного работника
+     */
+    @Column
+    private NotificationType type;
 }
